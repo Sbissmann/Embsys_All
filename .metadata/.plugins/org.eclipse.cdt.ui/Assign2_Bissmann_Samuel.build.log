@@ -1,0 +1,17 @@
+22:18:52 **** Incremental Build of configuration Debug for project Assign2_Bissmann_Samuel ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L432xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "Assign2_Bissmann_Samuel.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\samue\STM32CubeIDE\workspace_1.13.1\Assign2_Bissmann_Samuel\STM32L432KCUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Assign2_Bissmann_Samuel.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Assign2_Bissmann_Samuel.elf
+ 
+arm-none-eabi-size   Assign2_Bissmann_Samuel.elf 
+arm-none-eabi-objdump -h -S  Assign2_Bissmann_Samuel.elf  > "Assign2_Bissmann_Samuel.list"
+   text	   data	    bss	    dec	    hex	filename
+  29744	    120	  35720	  65584	  10030	Assign2_Bissmann_Samuel.elf
+Finished building: default.size.stdout
+ 
+Finished building: Assign2_Bissmann_Samuel.list
+ 
+
+22:18:53 Build Finished. 0 errors, 0 warnings. (took 700ms)
+

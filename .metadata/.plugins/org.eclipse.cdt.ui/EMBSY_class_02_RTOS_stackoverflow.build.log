@@ -1,0 +1,10 @@
+20:13:08 **** Incremental Build of configuration Debug for project EMBSY_class_02_RTOS_stackoverflow ****
+make -j16 all 
+arm-none-eabi-size   EMBSY_class_02_RTOS_stackoverflow.elf 
+   text	   data	    bss	    dec	    hex	filename
+  26864	    104	   8672	  35640	   8b38	EMBSY_class_02_RTOS_stackoverflow.elf
+Finished building: default.size.stdout
+ 
+
+20:13:08 Build Finished. 0 errors, 0 warnings. (took 246ms)
+

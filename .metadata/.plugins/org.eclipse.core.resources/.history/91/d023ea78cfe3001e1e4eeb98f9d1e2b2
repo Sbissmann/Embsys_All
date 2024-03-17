@@ -1,0 +1,439 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#include "cmsis_os.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "semphr.h"
+#include <stdbool.h>
+#include <stdio.h>
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+#define NUM_PRODS 7
+#define RING_BUFFER_SIZE 10
+
+typedef struct{
+	int data;
+	osThreadId_t producer_task;
+}
+rb_elem;
+
+typedef struct{
+	rb_elem buffer[RING_BUFFER_SIZE];
+	SemaphoreHandle_t mutex;
+	SemaphoreHandle_t items;
+}ring_buffer;
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart2;
+
+/* Definitions for ConsumerTask */
+osThreadId_t ConsumerTaskHandle;
+const osThreadAttr_t ConsumerTask_attributes = {
+  .name = "ConsumerTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for myCountingSem01 */
+osSemaphoreId_t myCountingSem01Handle;
+const osSemaphoreAttr_t myCountingSem01_attributes = {
+  .name = "myCountingSem01"
+};
+/* USER CODE BEGIN PV */
+
+
+osThreadId_t ProducerTaskHandle;
+const osThreadAttr_t ProducerTask_attributes = {
+  .name = "ProducerTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+static ring_buffer rb;
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_USART2_UART_Init(void);
+void ConsumerTask_Entry(void *argument);
+
+/* USER CODE BEGIN PFP */
+bool Ringbuffer_Put(rb_elem elem);
+bool Ringbuffer_Get(rb_elem *elem);
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+void ProducerTask_Entry(void *argument) {
+    // Get the ID of the current thread
+    osThreadId_t producerId = osThreadGetId();
+
+    rb_elem data;
+    data.data = (int)argument;
+    data.producer_task = producerId;
+
+    while (1) {
+        // Add data to ring buffer
+        Ringbuffer_Put(data);
+        osDelay(1000); // Delay for 1 second
+
+        // Print the ID of the current producer task
+        printf("Producer Task ID: %p\n", producerId);
+    }
+}
+
+int __io_putchar(int ch)
+{
+	int ret;
+	while ((ret=HAL_UART_GetState(&huart2)) != HAL_UART_STATE_READY)
+		;
+
+	if (ch == '\n')
+	{
+		static uint8_t buf[2] = { '\r', '\n' };
+		HAL_UART_Transmit(&huart2, buf, sizeof(buf), 1000);
+	}
+	else
+	{
+		static char buf;
+		buf = ch;
+		HAL_UART_Transmit(&huart2, (uint8_t *)&buf, 1, 1000);
+	}
+	return ch;
+}
+
+
+bool Ringbuffer_Put(rb_elem elem)
+{
+	 if (xSemaphoreTake(rb.mutex, portMAX_DELAY) == pdTRUE) {
+	        // Check if there is space in the buffer
+	        if (uxSemaphoreGetCount(rb.items) < RING_BUFFER_SIZE) {
+	            // Add element to the buffer
+	            rb.buffer[uxSemaphoreGetCount(rb.items)] = elem;
+	            // Increment the count of items in the buffer
+	            xSemaphoreGive(rb.items);
+	            xSemaphoreGive(rb.mutex);
+	            return true;
+	        }
+	        else {
+	            // Buffer is full
+	            xSemaphoreGive(rb.mutex);
+	            return false;
+	        }
+	    }
+	    return false;
+}
+
+bool Ringbuffer_Get(rb_elem *elem) {
+    if (xSemaphoreTake(rb.mutex, portMAX_DELAY) == pdTRUE) {
+        // Check if there are any items in the buffer
+        if (uxSemaphoreGetCount(rb.items) > 0) {
+            // Retrieve the oldest element from the buffer
+            *elem = rb.buffer[RING_BUFFER_SIZE - uxSemaphoreGetCount(rb.items)];
+            // Decrement the count of items in the buffer
+            xSemaphoreTake(rb.items, portMAX_DELAY);
+            xSemaphoreGive(rb.mutex);
+            return true;
+        }
+        else {
+            // Buffer is empty
+            xSemaphoreGive(rb.mutex);
+            return false;
+        }
+    }
+    return false;
+}
+
+
+
+
+
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_USART2_UART_Init();
+  /* USER CODE BEGIN 2 */
+
+  /* USER CODE END 2 */
+
+  /* Init scheduler */
+  osKernelInitialize();
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+rb.mutex=xSemaphoreCreateMutex();
+rb.items=xSemaphoreCreateCounting(RING_BUFFER_SIZE,0);
+
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* Create the semaphores(s) */
+  /* creation of myCountingSem01 */
+  myCountingSem01Handle = osSemaphoreNew(2, 2, &myCountingSem01_attributes);
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* creation of ConsumerTask */
+  ConsumerTaskHandle = osThreadNew(ConsumerTask_Entry, NULL, &ConsumerTask_attributes);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  for(int i=1;i<=RING_BUFFER_SIZE;i++)
+  {
+
+	 osThreadNew(ProducerTask_Entry, (void*)i, NULL);
+	 printf("created: %d",i);
+  }
+
+
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* USER CODE BEGIN RTOS_EVENTS */
+  /* add events, ... */
+  /* USER CODE END RTOS_EVENTS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+  }
+  /* USER CODE END 3 */
+}
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Configure the main internal regulator output voltage
+  */
+  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.MSICalibrationValue = 0;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
+}
+
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_ConsumerTask_Entry */
+/**
+* @brief Function implementing the ConsumerTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_ConsumerTask_Entry */
+void ConsumerTask_Entry(void *argument)
+{
+  /* USER CODE BEGIN 5 */
+	   rb_elem data;
+	    data.data = (int)argument;
+	    data.producer_task = osThreadGetId();
+
+	    while (1) {
+	        // Add data to ring buffer
+	        Ringbuffer_Put(data);
+	        osDelay(1000); // Delay for 1 second
+	        //printf("ich bins Task: %p\n", osThreadGetId());
+	    }
+  /* USER CODE END 5 */
+}
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
+}
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */
