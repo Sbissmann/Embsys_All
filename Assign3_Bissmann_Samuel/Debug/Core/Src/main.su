@@ -1,0 +1,13 @@
+../Core/Src/main.c:163:5:__io_putchar	24	static
+../Core/Src/main.c:196:5:_write	32	static
+../Core/Src/main.c:212:5:main	8	static
+../Core/Src/main.c:320:6:SystemClock_Config	96	static
+../Core/Src/main.c:381:13:MX_USART2_UART_Init	8	static
+../Core/Src/main.c:417:13:MX_GPIO_Init	40	static
+../Core/Src/main.c:445:6:HAL_UART_RxCpltCallback	24	static
+../Core/Src/main.c:489:6:Monitoring_Task_Entry	24	static
+../Core/Src/main.c:547:6:ProducerTask01_Entry	40	static
+../Core/Src/main.c:590:6:ProducerTask02_Entry	40	static
+../Core/Src/main.c:633:6:ProducerTask03_Entry	40	static
+../Core/Src/main.c:677:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/main.c:694:6:Error_Handler	4	static,ignoring_inline_asm

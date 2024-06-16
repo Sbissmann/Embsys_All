@@ -4,11 +4,23 @@
 		<item key="WizardProjectsImportPage.STORE_NESTED_PROJECTS" value="true"/>
 	</section>
 	<section name="CleanDialogSettings">
-		<item key="BUILD_NOW" value="false"/>
+		<item key="BUILD_NOW" value="true"/>
 		<item key="BUILD_ALL" value="true"/>
 		<item key="TOGGLE_SELECTED" value="false"/>
 		<item key="DIALOG_WIDTH" value="500"/>
 		<item key="DIALOG_HEIGHT" value="467"/>
 		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+	</section>
+	<section name="SmartImportWizard">
+		<item key="SmartImportRootWizardPage.STORE_HIDE_ALREADY_OPEN" value="false"/>
+		<item key="SmartImportRootWizardPage.STORE_CLOSE_IMPORTED" value="false"/>
+		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
+		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
+		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="C:\Users\samue\STM32CubeIDE\workspace_1.13.1\EMBSY_RTOS_station"/>
+			<item value="C:\Users\samue\STM32CubeIDE\workspace_1.13.1\BISSMANN_S_WIFI"/>
+			<item value="C:\Users\samue\Downloads\ORIGINAL_wifi_demo_ORIGINAL\EMBSY_RTOS_wifi_demo_AP"/>
+			<item value="C:\Users\samue\STM32CubeIDE\workspace_1.13.1\EMBSY_class_02_RTOS_printf"/>
+		</list>
 	</section>
 </section>

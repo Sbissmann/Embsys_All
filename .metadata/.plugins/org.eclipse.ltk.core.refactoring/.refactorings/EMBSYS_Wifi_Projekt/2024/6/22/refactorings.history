@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;EMBSYS_Wifi_Projekt/Core/Wifi_module/wifi_module&apos; to &apos;wifi_module.c&apos;" description="Rename resource &apos;wifi_module&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Core/Wifi_module/wifi_module" name="wifi_module.c" stamp="1717233521802" updateReferences="true"/>
+</session>

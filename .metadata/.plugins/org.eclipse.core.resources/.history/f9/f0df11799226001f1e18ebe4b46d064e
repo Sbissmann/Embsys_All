@@ -1,0 +1,48 @@
+
+#include "3DClick_Main.h"
+extern I2C_HandleTypeDef hi2c1;
+
+osThreadId_t MotionClickData;
+const osThreadAttr_t MotionTask_attributes = {
+		.name = MCLICK_TASK_NAME,
+		.stack_size = MCLICK_TASK_SIZE,
+		.priority = (osPriority_t) MCLICK_TASK_PRIORITY,
+};
+
+osThreadId_t MotionClickFormat;
+const osThreadAttr_t MotionClickFormat_attributes = {
+		.name = WIFI_TASK_NAME,
+		.stack_size = WIFI_TASK_SIZE,
+		.priority = (osPriority_t) WIFI_TASK_PRIORITY,
+};
+
+
+
+
+
+void read_gyro_data(int16_t *gyro_x, int16_t *gyro_y, int16_t *gyro_z) {
+    uint8_t report_id = GYRO_REPORT_ID;
+    uint8_t buffer[REPORT_LENGTH];
+
+    // Writing the report ID to the gyro device
+    if (HAL_I2C_Master_Transmit(&hi2c1, GYRO_ADDRESS, &report_id, 1, HAL_MAX_DELAY) != HAL_OK) {
+        // Transmission error
+        Error_Handler();
+    }
+
+    // Reading the data from the gyro device
+    if (HAL_I2C_Master_Receive(&hi2c1, GYRO_ADDRESS, buffer, REPORT_LENGTH, HAL_MAX_DELAY) != HAL_OK) {
+        // Reception error
+        Error_Handler();
+    }
+
+    // Process the gyro data (assuming little-endian format)
+    *gyro_x = buffer[0] | (buffer[1] << 8);
+    *gyro_y = buffer[2] | (buffer[3] << 8);
+    *gyro_z = buffer[4] | (buffer[5] << 8);
+
+
+}
+
+ 
+ 

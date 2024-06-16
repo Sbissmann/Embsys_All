@@ -32,6 +32,8 @@
 
 #define NUM_PRODS 7
 #define RING_BUFFER_SIZE 10
+#define PRODUCER_TIME 1000
+#define CONSUMER_TIME 90
 
 typedef struct{
 	int data;
@@ -43,6 +45,9 @@ typedef struct{
 	rb_elem buffer[RING_BUFFER_SIZE];
 	SemaphoreHandle_t mutex;
 	SemaphoreHandle_t items;
+
+	int head;
+	int tail;
 }ring_buffer;
 
 /* USER CODE END PTD */
@@ -75,6 +80,11 @@ const osSemaphoreAttr_t myCountingSem01_attributes = {
   .name = "myCountingSem01"
 };
 /* USER CODE BEGIN PV */
+osThreadId_t ProducerTaskHandle;
+const osThreadAttr_t ProducerTask_attributes = {
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 
 
 
@@ -124,27 +134,31 @@ int __io_putchar(int ch)
 bool Ringbuffer_Put(rb_elem elem)
 {
     if (xSemaphoreTake(rb.mutex, portMAX_DELAY) == pdTRUE) {
-        // Calculate the index where the element should be inserted
+        // Check if there's space in the buffer
+        if (uxSemaphoreGetCount(rb.items) < RING_BUFFER_SIZE) {
 
-    	if(uxSemaphoreGetCount(rb.items)<10)
-    	{
-    		int insert_index = (RING_BUFFER_SIZE - uxSemaphoreGetCount(rb.items));
+        	//Update head
+            rb.buffer[rb.head] = elem;
+            rb.head++;
+            rb.head=rb.head%10;
 
-        // Add element to the buffer
-        rb.buffer[insert_index] = elem;
+            // Increment the count of items in the buffer
+            xSemaphoreGive(rb.items);
 
-        // Increment the count of items in the buffer
-        xSemaphoreGive(rb.items);
-        printf("YappyAPp");
-    	}
-    	else
-    	printf("Buffer Full!");
 
-        xSemaphoreGive(rb.mutex);
-        return true;
+
+            xSemaphoreGive(rb.mutex);
+            return true;
+        }
+        else {
+            printf("Buffer Full!");
+            xSemaphoreGive(rb.mutex);
+        }
     }
-    return false;
+    return false; // Return false if mutex couldn't be acquired
 }
+
+
 
 
 
@@ -152,9 +166,11 @@ bool Ringbuffer_Get(rb_elem *elem) {
     if (xSemaphoreTake(rb.mutex, portMAX_DELAY) == pdTRUE) {
         // Check if there are any items in the buffer
         if (uxSemaphoreGetCount(rb.items) > 0) {
-            // Retrieve the oldest element from the buffer
-            *elem = rb.buffer[RING_BUFFER_SIZE - uxSemaphoreGetCount(rb.items)];
-            // Decrement the count of items in the buffer
+
+            *elem = rb.buffer[rb.tail];
+            rb.tail++;
+            rb.tail=rb.tail%10;
+
             xSemaphoreTake(rb.items, portMAX_DELAY);
             xSemaphoreGive(rb.mutex);
             return true;
@@ -239,9 +255,11 @@ rb.items=xSemaphoreCreateCounting(RING_BUFFER_SIZE,0);
   ConsumerTaskHandle = osThreadNew(ConsumerTask_Entry, NULL, &ConsumerTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
+
+  //Creation of threads
   for(int i=1;i<=NUM_PRODS;i++)
   {
-	  osThreadId_t ProducerCreated=osThreadNew(ProducerTask_Entry, (void*)i, NULL);
+	  osThreadId_t ProducerCreated=osThreadNew(ProducerTask_Entry, (void*)i, &ProducerTask_attributes);
 
 	 if(ProducerCreated==NULL)
 	 {
@@ -378,6 +396,13 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+/**
+* @brief Function implementing the ProducerTask thread.
+* Puts Data element with Producer ID in the Buffer.
+* Runs cyclically in Producer_Time
+* @param argument: Id of the producing task
+* @retval None
+*/
 void ProducerTask_Entry(void *argument) {
     // Get the ID of the current thread
     osThreadId_t producerId = osThreadGetId();
@@ -386,14 +411,23 @@ void ProducerTask_Entry(void *argument) {
     data.data = (int)argument;
     data.producer_task = producerId;
 
+
+
     while (1) {
         // Add data to ring buffer
-        Ringbuffer_Put(data);
-        osDelay(1000); // Delay for 1 second
 
-        // Print the ID of the current producer task
-       // printf("Producer Task ID: %5p\n", producerId);
+    	if(Ringbuffer_Put(data))
+    	{
+    		printf("produced			\n");
+    	}
+    	else
+    	{
 
+    		printf("Buffer Full			\n");
+    	}
+
+
+        osDelay(PRODUCER_TIME);
 
     }
 }
@@ -403,6 +437,7 @@ void ProducerTask_Entry(void *argument) {
 /* USER CODE BEGIN Header_ConsumerTask_Entry */
 /**
 * @brief Function implementing the ConsumerTask thread.
+* Prints the data element task id, prod-Tasks run cyclically in CONSUMER_TIME interval
 * @param argument: Not used
 * @retval None
 */
@@ -413,14 +448,17 @@ void ConsumerTask_Entry(void *argument)
 	while (1) {
 	        rb_elem data;
 
-	        // Get data from the ring buffer
 	        if (Ringbuffer_Get(&data)) {
-	            // Print received data and producer task ID
-	            printf("Received data: %2d from Producer Task: %5p\n", data.data, data.producer_task);
-	        }
 
-	        // Delay for a short period to avoid busy-waiting
-	        osDelay(100);
+
+	        	 printf("Received Data from Task-ID: %d, Thread-No: %p\n", data.data,data.producer_task);
+	        }
+	        else
+	        {
+
+	        	printf("		Im empty \n");
+	        }
+	        osDelay(CONSUMER_TIME);
 	    }
   /* USER CODE END 5 */
 }

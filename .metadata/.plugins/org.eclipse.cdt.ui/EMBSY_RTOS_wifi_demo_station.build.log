@@ -1,0 +1,25 @@
+20:22:15 **** Incremental Build of configuration Debug for project EMBSY_RTOS_wifi_demo_station ****
+make -j16 all 
+arm-none-eabi-gcc "../Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L432xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.d" -MT"Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.o"
+../Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.c: In function 'read_orientation_data':
+../Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.c:64:12: error: 'buffer' undeclared (first use in this function)
+   64 |     *yaw = buffer[0] | (buffer[1] << 8);
+      |            ^~~~~~
+../Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.c:64:12: note: each undeclared identifier is reported only once for each function it appears in
+../Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.c: In function 'MotionClickData_Task':
+../Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.c:79:9: warning: implicit declaration of function 'printf' [-Wimplicit-function-declaration]
+   79 |         printf("Yaw: %d, Pitch: %d, Roll: %d\n", yaw, pitch, roll);
+      |         ^~~~~~
+../Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.c:3:1: note: include '<stdio.h>' or provide a declaration of 'printf'
+    2 | #include "3DClick_Main.h"
+  +++ |+#include <stdio.h>
+    3 | extern I2C_HandleTypeDef hi2c1;
+../Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.c:79:9: warning: incompatible implicit declaration of built-in function 'printf' [-Wbuiltin-declaration-mismatch]
+   79 |         printf("Yaw: %d, Pitch: %d, Roll: %d\n", yaw, pitch, roll);
+      |         ^~~~~~
+../Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.c:79:9: note: include '<stdio.h>' or provide a declaration of 'printf'
+make: *** [Core/custom_middleware/99_tasks/3D-Click/subdir.mk:19: Core/custom_middleware/99_tasks/3D-Click/3DClick_Main.o] Error 1
+"make -j16 all" terminated with exit code 2. Build might be incomplete.
+
+20:22:16 Build Failed. 2 errors, 2 warnings. (took 342ms)
+

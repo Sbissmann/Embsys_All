@@ -1,0 +1,10 @@
+19:43:06 **** Incremental Build of configuration Debug for project Assign3_Bissmann_Samuel ****
+make -j16 all 
+arm-none-eabi-size   Assign3_Bissmann_Samuel.elf 
+   text	   data	    bss	    dec	    hex	filename
+  34264	    120	  35720	  70104	  111d8	Assign3_Bissmann_Samuel.elf
+Finished building: default.size.stdout
+ 
+
+19:43:06 Build Finished. 0 errors, 0 warnings. (took 240ms)
+

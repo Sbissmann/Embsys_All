@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;EMBSY_RTOS_wifi_demo_station/Core/custom_middleware/99_tasks/3D-Click/3DClick_Main&apos; to &apos;3DClick_Main.c&apos;" description="Rename resource &apos;3DClick_Main&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Core/custom_middleware/99_tasks/3D-Click/3DClick_Main" name="3DClick_Main.c" stamp="1717956352730" updateReferences="true"/>
+</session>

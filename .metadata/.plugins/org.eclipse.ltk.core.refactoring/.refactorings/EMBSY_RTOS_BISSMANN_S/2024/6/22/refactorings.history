@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;EMBSY_RTOS_wifi_demo_AP/Core/custom_middleware/99_tasks/diagnostics_data/diagnostics&apos; to &apos;diagnostics.h&apos;" description="Rename resource &apos;diagnostics&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Core/custom_middleware/99_tasks/diagnostics_data/diagnostics" name="diagnostics.h" stamp="1717254937791" updateReferences="true"/>
+</session>

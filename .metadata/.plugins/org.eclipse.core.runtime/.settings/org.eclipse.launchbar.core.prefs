@@ -1,7 +1,7 @@
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch=x86_64
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/name=Local
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=win32
-configDescList=org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Assign2_Bissmann_Samuel Debug
+configDescList=org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:EMBSY_RTOS_wifi_demo_station
 eclipse.preferences.version=1
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Assign1_dyn_Bissmann_Samuel\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Assign1_dyn_Bissmann_Samuel\ Debug/activeLaunchTarget=null\:---
@@ -9,3 +9,12 @@ org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Assign1_dyn_Bissmann_Samuel/act
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Assign1_dyn_Bissmann_Samuel/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Assign2_Bissmann_Samuel\ Debug/activeLaunchMode=run
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Assign2_Bissmann_Samuel\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Assign3_Bissmann_Samuel\ Debug/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Assign3_Bissmann_Samuel\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:EMBSY_RTOS_BISSMANN_S\ Debug/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:EMBSY_RTOS_BISSMANN_S\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:EMBSY_RTOS_wifi_demo_AP/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:EMBSY_RTOS_wifi_demo_AP/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:EMBSY_RTOS_wifi_demo_station/activeLaunchMode=run
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:EMBSY_RTOS_wifi_demo_station/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:EMBSY_class_02_RTOS_printf\ Debug/activeLaunchMode=run
