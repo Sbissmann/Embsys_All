@@ -1,0 +1,29 @@
+/*
+ * diagnose.h
+ *
+ *  Created on: Jun 2, 2024
+ *      Author: samue
+ */
+
+#ifndef CUSTOM_MIDDLEWARE_99_TASKS_DIAGNOSE_DIAGNOSE_H_
+#define CUSTOM_MIDDLEWARE_99_TASKS_DIAGNOSE_DIAGNOSE_H_
+
+#ifndef _DIAGNOSE_H_
+#define _DIAGNOSE_H_
+
+typedef enum {
+    WIFI_ERR_NONE = 0,
+    WIFI_ERR_UART_TRANSMIT = 1 << 0,
+    WIFI_ERR_UART_RECEIVE = 1 << 1,
+    WIFI_ERR_NO_CONNECT = 1 << 2,
+    WIFI_ERR_TCP_SEND = 1 << 3,
+    // Add more error masks as needed
+} wifi_error_t;
+
+volatile uint32_t wifi_error_mask = WIFI_ERR_NONE;
+
+
+#endif
+
+
+#endif /* CUSTOM_MIDDLEWARE_99_TASKS_DIAGNOSE_DIAGNOSE_H_ */

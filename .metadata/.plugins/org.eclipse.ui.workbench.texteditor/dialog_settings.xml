@@ -8,6 +8,11 @@
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="wifi_error_t"/>
+			<item value="wifi_error_mask"/>
+			<item value="ColorClickData_Task"/>
+			<item value="todiag"/>
+			<item value="ColorClickData_attributes"/>
 			<item value="wifi"/>
 			<item value="ready"/>
 			<item value="rxBuffer_uart_1"/>
@@ -18,11 +23,6 @@
 			<item value="uart"/>
 			<item value="MX_USART2_UART_Init"/>
 			<item value="producerTask"/>
-			<item value="printf"/>
-			<item value="minimum"/>
-			<item value="minimum Stack size"/>
-			<item value="ConsumerTaskHandle"/>
-			<item value="for"/>
 		</list>
 		<list key="replacehistory">
 			<item value=""/>

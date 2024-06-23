@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;EMBSY_RTOS_wifi_demo_station&apos; to &apos;ColorClick_BISSMANN_S&apos;" description="Rename resource &apos;EMBSY_RTOS_wifi_demo_station&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/EMBSY_RTOS_wifi_demo_station" name="ColorClick_BISSMANN_S" stamp="1719176468209" updateReferences="true"/>
+</session>

@@ -1,0 +1,61 @@
+/*
+ * 3DClick_Main.h
+ *
+ *  Created on: Jun 9, 2024
+ *      Author: samue
+ */
+
+#ifndef CUSTOM_MIDDLEWARE_99_TASKS_COLOR_CLICK_MAIN_COLORCLICK_MAIN_H_
+#define CUSTOM_MIDDLEWARE_99_TASKS_COLOR_CLICK_MAIN_COLORCLICK_MAIN_H_
+
+#ifndef COLORCLICK_MAIN_H
+#define COLORCLICK_MAIN_H
+
+// TCS3471 I2C address
+#define TCS3471_ADDRESS 0x29 // Adjust this based on your wiring (0x39 is also common)
+
+// TCS3471 register addresses
+#define TCS3471_COMMAND_BIT 0x80
+#define TCS3471_ENABLE 0x00
+#define TCS3471_ATIME 0x01
+#define TCS3471_CONTROL 0x0F
+#define TCS3471_ID 0x12
+#define TCS3471_STATUS 0x13
+#define TCS3471_CDATAL 0x14
+
+// Enable register bits
+#define TCS3471_ENABLE_AEN 0x02
+#define TCS3471_ENABLE_PON 0x01
+
+// Externally defined I2C handle
+extern I2C_HandleTypeDef hi2c1;
+
+// Function prototypes
+void TCS3471_Write(uint8_t reg, uint8_t value);
+uint8_t TCS3471_Read(uint8_t reg);
+void TCS3471_Init(void);
+void TCS3471_Read_RGBC(uint16_t *r, uint16_t *g, uint16_t *b, uint16_t *c);
+void ColorClickData_Task(void *argument);
+void initI2CTask(void)
+
+// Task related definitions
+extern osThreadId_t ColorCickData;
+extern const osThreadAttr_t ColorClickData_attributes;
+extern osThreadId_t ColorClickFormatDiag;
+extern const osThreadAttr_t MotionClickFormat_attributes;
+
+#endif // COLORCLICK_MAIN_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* CUSTOM_MIDDLEWARE_99_TASKS_COLOR_CLICK_MAIN_COLORCLICK_MAIN_H_ */

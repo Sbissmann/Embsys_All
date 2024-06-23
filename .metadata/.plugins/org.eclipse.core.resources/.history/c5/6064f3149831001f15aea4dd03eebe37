@@ -1,0 +1,158 @@
+#include "ColorClick_Main.h"
+
+
+osThreadId_t colorClickTaskHandle;
+const osThreadAttr_t ColorClickData_attributes = {
+    .name = CCLICK_TASK_NAME,
+    .stack_size = CCLICK_TASK_SIZE,
+    .priority = (osPriority_t) CCLICK_TASK_PRIORITY,
+};
+
+osThreadId_t colorClickFormatHandle;
+const osThreadAttr_t ColorClickFormat_attributes = {
+    .name = DATAFORMAT_TASK_NAME,
+    .stack_size = DATAFORMAT_SIZE,
+    .priority = (osPriority_t) DATAFORMAT_PRIORITY,
+};
+
+
+void initI2CTask(void)
+{
+
+	colorClickTaskHandle = osThreadNew(ColorClickData_Task, NULL, &ColorClickData_attributes);
+
+	if (colorClickTaskHandle == NULL) {
+			printf("creating I2C_task_failed\r\n");
+		}
+
+
+
+	colorClickFormatHandle = osThreadNew(ColorClickFormat_Task , NULL, &ColorClickFormat_attributes);
+
+		if (colorClickTaskHandle == NULL) {
+				printf("creating Formatt\r\n");
+			}
+
+
+}
+
+
+
+// Function to write to a TCS3471 register
+void TCS3471_Write(uint8_t reg, uint8_t value) {
+    uint8_t data[2] = { TCS3471_COMMAND_BIT | reg, value };
+    HAL_I2C_Master_Transmit(&hi2c1, TCS3471_ADDRESS << 1, data, 2, HAL_MAX_DELAY);
+}
+
+// Function to read from TCS3471 register
+uint8_t TCS3471_Read(uint8_t reg) {
+    uint8_t value;
+    uint8_t reg_addr = TCS3471_COMMAND_BIT | reg;
+    HAL_I2C_Master_Transmit(&hi2c1, TCS3471_ADDRESS << 1, &reg_addr, 1, HAL_MAX_DELAY);
+    HAL_I2C_Master_Receive(&hi2c1, TCS3471_ADDRESS << 1, &value, 1, HAL_MAX_DELAY);
+    return value;
+}
+
+// Function to initialize the TCS3471 sensor
+void TCS3471_Init(void) {
+    // Power on and enable RGBC
+    TCS3471_Write(TCS3471_ENABLE, TCS3471_ENABLE_PON);
+    HAL_Delay(30); // Wait for power on
+    TCS3471_Write(TCS3471_ENABLE, TCS3471_ENABLE_PON | TCS3471_ENABLE_AEN);
+
+    // Set integration time (e.g., 700ms)
+    TCS3471_Write(TCS3471_ATIME, 0x00);
+
+    // Set control register (gain = 1x)
+    TCS3471_Write(TCS3471_CONTROL, 0x00);
+}
+
+// Function to read RGBC data from TCS3471
+void TCS3471_Read_RGBC(uint16_t *r, uint16_t *g, uint16_t *b, uint16_t *c) {
+    *c = TCS3471_Read(TCS3471_CDATAL) 	  | (TCS3471_Read(TCS3471_CDATAL + 1) << 8);
+    *r = TCS3471_Read(TCS3471_CDATAL + 2) | (TCS3471_Read(TCS3471_CDATAL + 3) << 8);
+    *g = TCS3471_Read(TCS3471_CDATAL + 4) | (TCS3471_Read(TCS3471_CDATAL + 5) << 8);
+    *b = TCS3471_Read(TCS3471_CDATAL + 6) | (TCS3471_Read(TCS3471_CDATAL + 7) << 8);
+}
+
+
+uint64_t pack_uint16_values(uint16_t value1, uint16_t value2, uint16_t value3, uint16_t value4) {
+  uint64_t packed_value = 0;
+
+  // Shift and mask each value to its designated position
+  packed_value |= (uint64_t)value1 << 48;  // Move value1 to the upper 16 bits
+  packed_value |= (uint64_t)value2 << 32;  // Move value2 to the next 16 bits
+  packed_value |= (uint64_t)value3 << 16;  // Move value3 to the following 16 bits
+  packed_value |= (uint64_t)value4;       	// Place value4 in the lower 16 bits
+
+  return packed_value;
+}
+
+
+uint8_t scaleToUint8_t(uint16_t myvalue)
+{
+	uint32_t tempRes=myvalue*255/65535;
+
+
+	return (uint64_t)(myvalue*255)*255;
+}
+
+
+
+void ColorClickFormat_Task(void *argument)
+{
+
+	while(1){
+	//receive message queue
+	uint64_t message;
+	osMessageQueueGet(toDiagTaskHandle, &message, NULL, 50);
+
+	//extracting the values again
+	  uint16_t *c = (uint16_t)(message & 0xFFFF);           // Get lower 16 bits
+	  message >>= 16;                                 		  // Shift right by 16 bits
+	  uint16_t *b = (uint16_t)(message & 0xFFFF);           // Get next 16 bits
+	  message >>= 16;                                		   // Shift right by 16 bits
+	  uint16_t *g = (uint16_t)(message & 0xFFFF);           // Get next 16 bits
+	  message >>= 16;                                 		  // Shift right by 16 bits
+	  uint16_t *r = (uint16_t)(message & 0xFFFF);           // Get upper 16 bits
+
+	//scale the values
+	  data_struct_t DataToWifi;
+
+	  DataToWifi.R=scaleToUint8_t(*r);
+	  DataToWifi.G=scaleToUint8_t(*g);
+	  DataToWifi.B=scaleToUint8_t(*b);
+	  DataToWifi.W=scaleToUint8_t(*c);
+
+
+
+
+	//FormatData for diagnostic purposes and add wifi status
+
+	}
+
+
+
+}
+
+void ColorClickData_Task(void *argument) {
+    uint16_t r, g, b, c;
+
+    TCS3471_Init();
+
+    for (;;) {
+        TCS3471_Read_RGBC(&r, &g, &b, &c);
+
+        uint64_t message= pack_uint16_values(r, g, b, c);
+
+            if (osMessageQueuePut(toDiagTaskHandle, &message, 0, 50) == osOK) {
+                printf("Message sent: %d\n", (int)message);
+            } else {
+                printf("Failed to send message\n");
+            }
+
+       // printf("Red: %d, Green: %d, Blue: %d, Clear: %d\n", r, g, b, c);
+
+        osDelay(200); // Delay to simulate the task periodicity
+    }
+}
