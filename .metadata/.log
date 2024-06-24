@@ -4503,3 +4503,18 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY org.eclipse.cdt.core 1 0 2024-06-23 23:01:11.387
 !MESSAGE Indexed 'ColorClick_BISSMANN_S' (45 sources, 160 headers) in 2.51 sec: 17,167 declarations; 93,812 references; 3 unresolved inclusions; 156 syntax errors; 172 unresolved names (0.15%)
+!SESSION 2024-06-24 14:48:30.042 -----------------------------------------------
+eclipse.buildId=Version 1.13.1
+java.version=17.0.6
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_AT
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2024-06-24 14:48:33.502
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2024-06-24 14:48:33.504
+!MESSAGE Log4j2 initialized with config file C:\Users\samue\STM32CubeIDE\workspace_1.13.1\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2024-06-24 14:48:48.854
+!MESSAGE Started RMI Server, listening on port 41337
